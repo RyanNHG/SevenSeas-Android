@@ -1,17 +1,14 @@
 package ryan.nhg.sevenseas;
 
-import android.animation.LayoutTransition;
 import android.content.Context;
-import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
-import android.widget.RelativeLayout;
 
 /**
  * Created by ryan on 5/26/15.
  */
-public class Player extends Actor
+public class Player extends Ship
 {
 
     public Player(Context context, OnClickListener playerListener)
@@ -32,4 +29,7 @@ public class Player extends Actor
         params.leftMargin = getSize()*getTileX();
         this.setLayoutParams(params);
     }
+
+
 }
+

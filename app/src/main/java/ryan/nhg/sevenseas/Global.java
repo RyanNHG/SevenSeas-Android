@@ -11,6 +11,8 @@ public class Global
                                     NUM_ROWS = NUM_COLS;
 
     public static int               TILE_SIZE = 0;
+    public static TileButton[][]    tiles;
+
 
     public static final int         COLOR_SEABLUE = Color.rgb(0x00,0x66,0xff);
 
@@ -23,4 +25,12 @@ public class Global
                                         0, 315};
 
     public static final int         MOVE_DURATION = 1000;
+    public static final int         CANNON_RANGE = 3;
+
+    public static final int         TYPE_EMPTY = 0,
+                                    TYPE_WHIRLPOOL = 1,
+                                    TYPE_ISLAND = 2,
+                                    TYPE_WRECKAGE = 3;
+
+    public static final int         CHANCE_ISLAND = 10;
 }

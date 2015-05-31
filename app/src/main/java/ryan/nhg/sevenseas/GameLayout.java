@@ -20,6 +20,7 @@ public class GameLayout extends LinearLayout
     }
 
     protected void onMeasure (int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, widthMeasureSpec);
+        int min = Math.min(widthMeasureSpec,heightMeasureSpec);
+        super.onMeasure(min, min);
     }
 }

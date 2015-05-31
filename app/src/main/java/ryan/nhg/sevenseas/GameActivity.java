@@ -1,10 +1,14 @@
 package ryan.nhg.sevenseas;
 
+import android.app.Activity;
 import android.graphics.Color;
+import android.graphics.Interpolator;
 import android.provider.Settings;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Layout;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,7 +23,7 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 
 
-public class GameActivity extends ActionBarActivity {
+public class GameActivity extends AppCompatActivity {
 
 
     private View.OnClickListener tileListener, playerListener;
@@ -43,7 +47,7 @@ public class GameActivity extends ActionBarActivity {
             {
                 TileButton tileButton = (TileButton)v;
                 System.out.println(tileButton.getTileX() + ", " + tileButton.getTileY());
-                movePlayer(tileButton.getTileX(),tileButton.getTileY());
+                player.move(tileButton.getTileX(), tileButton.getTileY());
             }
         };
 
@@ -62,23 +66,46 @@ public class GameActivity extends ActionBarActivity {
         GameLayout gameLayout = new GameLayout(this);
         mainLayout.addView(gameLayout);
         gameLayout.setBackgroundColor(Color.GREEN);
+        
+        Global.tiles = new TileButton[Global.NUM_COLS][Global.NUM_ROWS];
 
         for(int y = 0; y < Global.NUM_ROWS; y++)
         {
             LinearLayout row = new LinearLayout(this);
             row.setOrientation(LinearLayout.HORIZONTAL);
             row.setBackgroundColor(Global.COLOR_SEABLUE);
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
             params.weight = 1;
             row.setLayoutParams(params);
+            row.setGravity(Gravity.CENTER);
             gameLayout.addView(row);
 
             for(int x = 0; x < Global.NUM_COLS; x++)
             {
-                row.addView(new TileButton(this, tileListener,x,y));
-            }
+                Global.tiles[x][y] = new TileButton(this, tileListener,x,y);
 
+                if(getRandomChance(Global.CHANCE_ISLAND)) Global.tiles[x][y].setType(Global.TYPE_ISLAND);
+
+                row.addView(Global.tiles[x][y]);
+            }
         }
+
+        Global.tiles[Global.NUM_COLS/2][Global.NUM_ROWS/2].setType(Global.TYPE_EMPTY);
+
+        initWhirlpools();
+    }
+
+    private boolean getRandomChance(int percent)
+    {
+        return (int)(Math.random()*100) < percent;
+    }
+
+    private void initWhirlpools()
+    {
+        Global.tiles[0][0].setType(Global.TYPE_WHIRLPOOL);
+        Global.tiles[0][Global.NUM_ROWS-1].setType(Global.TYPE_WHIRLPOOL);
+        Global.tiles[Global.NUM_COLS-1][0].setType(Global.TYPE_WHIRLPOOL);
+        Global.tiles[Global.NUM_COLS-1][Global.NUM_COLS-1].setType(Global.TYPE_WHIRLPOOL);
     }
 
     private void initPlayer()
@@ -88,53 +115,19 @@ public class GameActivity extends ActionBarActivity {
         mainLayout.addView(player);
     }
 
-    private void movePlayer(final int x, final int y)
-    {
-        ViewGroup.MarginLayoutParams params = ((ViewGroup.MarginLayoutParams)player.getLayoutParams());
-        final int size = player.getSize();
-        final int px = params.leftMargin/size;
-        final int py = params.topMargin/size;
-
-        if( (px-x)*(px-x) > 1 || (py-y)*(py-y) > 1) return;
-
-        Animation a = new Animation() {
-
-            protected void applyTransformation(float interpolatedTime, Transformation t) {
-                ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams)player.getLayoutParams();
-
-                if( x-px > 0) params.leftMargin = (int)(px*size + size * interpolatedTime);
-                else if( x-px < 0) params.leftMargin = (int)(px*size - size * interpolatedTime);
-
-                if( y-py > 0) params.topMargin = (int)(py*size + size * interpolatedTime);
-                else if( y-py < 0) params.topMargin = (int)(py*size - size * interpolatedTime);
-
-                player.setLayoutParams(params);
-            }
-        };
-        a.setDuration(300); // in ms
-        player.startAnimation(a);
-        player.update(x,y);
-
-    }
-
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
         getMenuInflater().inflate(R.menu.menu_game, menu);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
+        if (id == R.id.action_settings) return true;
 
         return super.onOptionsItemSelected(item);
     }
